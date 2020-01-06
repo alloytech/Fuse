@@ -47,7 +47,7 @@ declare namespace Fuse {
     shouldSort?: boolean;
     sortFn?: (a: { score: number }, b: { score: number }) => number;
     getFn?: (obj: any, path: string) => any;
-    keys?: (keyof T | string)[] | { name: keyof T | string; weight: number }[];
+    keys?: (keyof T | string | ((item: T) => string)[] | { name: keyof T | string | ((item: T) => string; weight: number }[];
     verbose?: boolean;
     tokenize?: boolean;
     tokenSeparator?: RegExp;

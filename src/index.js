@@ -121,6 +121,14 @@ class Fuse {
   }
 
   _search (tokenSearchers = [], fullSearcher) {
+    const executeAccessor = (item, accessor) => {
+      try {
+        return [accessor(item)];
+      } catch (_) {
+        return [];
+      }
+    }
+
     const list = this.list
     const resultMap = {}
     const results = []
@@ -154,7 +162,7 @@ class Fuse {
       // Iterate over every key
       for (let j = 0, keysLen = this.options.keys.length; j < keysLen; j += 1) {
         let key = this.options.keys[j]
-        if (typeof key !== 'string') {
+        if (typeof key === 'object' && key.name) {
           weights[key.name] = {
             weight: (1 - key.weight) || 1
           }
@@ -168,9 +176,10 @@ class Fuse {
           }
         }
 
+        const value = typeof key === 'function' ? executeAccessor(item, key) : this.options.getFn(item, key)
         this._analyze({
           key,
-          value: this.options.getFn(item, key),
+          value,
           record: item,
           index: i
         }, {

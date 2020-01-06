@@ -229,6 +229,50 @@ describe('Deep key search, with ["title", "author.firstName"]', () => {
   })
 })
 
+describe('Function key search', () => {
+  const customBookList = [{
+    title: "Old Man's War",
+    author: {firstName: 'John', lastName: 'Scalzi'}
+  }, {
+    title: 'The Lock Artist',
+    author: {firstName: 'Steve', lastName: 'Hamilton'}
+  }, {title: 'HTML5'}, {title: 'A History of England', author: {firstName: 1066, lastName: 'Hastings'}}]
+  let fuse
+  beforeEach(() => fuse = setup(customBookList, {keys: ['title', 'author.firstName', item => item.author.firstName]}))
+
+  describe('When searching for the term "Stve"', () => {
+    let result
+    beforeEach(() => result = fuse.search('Stve'))
+
+    test('we get a list containing at least 1 item', () => {
+      expect(result.length).toBeGreaterThanOrEqual(1)
+    })
+
+    test('and the first item has the matching key/value pairs', () => {
+      expect(result[0]).toMatchObject({
+        title: 'The Lock Artist',
+        author: {firstName: 'Steve', lastName: 'Hamilton'}
+      })
+    })
+  })
+
+  describe('When searching for the term "106"', () => {
+    let result
+    beforeEach(() => result = fuse.search('106'))
+
+    test('we get a list of exactly 1 item', () => {
+      expect(result).toHaveLength(1)
+    })
+
+    test('whose value matches', () => {
+      expect(result[0]).toMatchObject({
+        title: 'A History of England',
+        author: {firstName: 1066, lastName: 'Hastings'}
+      })
+    })
+  })
+})
+
 describe('Custom search function, with ["title", "author.firstName"]', () => {
   const customBookList = [{
     title: "Old Man's War",
